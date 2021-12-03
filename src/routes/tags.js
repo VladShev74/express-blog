@@ -1,35 +1,19 @@
 const express = require('express');
 const { Tags } = require('../models');
-const { schemaValidate } = require("../middlewares");
-const { tagsValidator } = require("../validationSchemas");
 
 const router = express.Router();
 
-router.get('/tags' ,async (req, res) => {
+router.get('/' ,async (req, res) => {
   try {
+    const { search } = req.query;
     const tags = await Tags.find({
-      title: {
+      name: {
         $regex: search,
         $options: "i",
       },
     });
 
-    res.json({
-      tags
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send(error);
-  }
-});
-
-// Created POST route for testing
-router.post('/tags', schemaValidate(tagsValidator.create), async (req, res) => {
-  try {
-    const newTag = await Tags.create({
-      name: req.body.name,
-    });
-    res.json(newTag);
+    res.json(tags);
   } catch (error) {
     console.log(error);
     res.status(500).send(error);
