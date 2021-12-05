@@ -21,9 +21,11 @@ const postsSchema = new Schema({
     views: {
         type: Number
     },
-    
-});
-
+    tags: {
+        type: []
+    },
+}, {timestamps: true});
+  
     // tags: {
     //     type: []
     // },

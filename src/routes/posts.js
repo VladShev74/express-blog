@@ -55,13 +55,14 @@ router.post('/', async (req, res, next) => {
   }
 })
 
-router.put('/posts/:postId', async (req, res, next) => {
+router.put('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
     const updated_post = await postsModel.findByIdAndUpdate(postId, req.body, {
       new: true
     });
-
+    
+    
     return res.json({
       status: 'success',
       code: 200,
@@ -93,11 +94,14 @@ router.delete('/:postId', async (req, res, next) => {
   }
 })
 
-router.patch('/posts/:postId', async (req, res, next) => {
+router.patch('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await postsModel.findByIdAndUpdate(postId, { usersLiked: usersLiked++});
+    const post = await postsModel.findById(postId);
 
+    post.usersLiked++;
+
+    await post.save();
     return res.json({
       status: 'success',
       code: 200,
@@ -114,10 +118,15 @@ router.patch('/posts/:postId', async (req, res, next) => {
 
 })
 
-router.patch('/posts/:postId', async (req, res, next) => {
+router.patch('/:postId/save', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await postsModel.findByIdAndUpdate(postId, { usersReading: usersReading++});
+    // add to user array
+    const post = await postsModel.findById(postId);
+
+    post.usersReading++;
+
+    await post.save();
 
     return res.json({
       status: 'success',
