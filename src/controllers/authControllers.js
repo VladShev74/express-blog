@@ -3,9 +3,9 @@ const jwt = require('jsonwebtoken');
 
 exports.register = async (req, res) => {
   try {
-    const existingUser = await User.findOne({ email: req.body.email });
+    const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
-      res.status(409).json({ message: "This email is already in use." });
+      res.status(409).json({ message: "This username is already in use." });
       return;
     }
 
@@ -31,7 +31,7 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
+    const user = await User.findOne({ username: req.body.username });
     if (!user || !(await user.validPassword(req.body.password))) {
       res.status(400).json({ message: "invalid credentials" });
       return;
