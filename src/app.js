@@ -8,7 +8,7 @@ const passport = require("passport");
 const { Strategy, ExtractJwt } = require("passport-jwt");
 
 const app = express();
-const { auth, tags } = require("./routes");
+const { auth, tags, users } = require("./routes");
 const { User } = require("./models");
 
 mongoose
@@ -44,5 +44,6 @@ passport.use(
 
 app.use("/api/auth", auth);
 app.use("/api/tags", tags);
+app.use("/api/users", users);
 
 module.exports = app;

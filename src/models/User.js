@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, SchemaTypes } = require("mongoose");
 const bcrypt = require("bcryptjs");
 
 const User = new Schema(
@@ -52,6 +52,14 @@ const User = new Schema(
       minlength: 3,
       required: false,
     },
+    following: [{
+      type: Schema.Types.ObjectId,
+      ref: 'user'
+    }],
+    followers: [{
+    type: Schema.Types.ObjectId,
+    ref: 'user'
+    }],
   },
   { timestamps: true }
 );
