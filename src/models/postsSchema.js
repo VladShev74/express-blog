@@ -21,20 +21,21 @@ const postsSchema = new Schema({
     views: {
         type: Number
     },
-    tags: {
-        type: []
+    tags: [{
+        type: Schema.Types.ObjectId,
+        ref: 'tag'
+    }],
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: 'user'
     },
 }, {timestamps: true});
-  
-    // tags: {
-    //     type: []
-    // },
+ 
+
     // comments: {
     //     type: []
     // },
-    // author: {
-    //     type: String
-    // },
+
 
 const postsModel = mongoose.model("Posts", postsSchema);
 

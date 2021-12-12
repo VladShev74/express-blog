@@ -1,11 +1,14 @@
-const express = require('express')
-const postsModel = require("../models/postsSchema");
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
+
+const { auth } = require('../middlewares');
+const { Tags, Posts } = require("../models");
+
 
 // respond with "hello world" when a GET request is made to the homepage
 router.get('/', async (req, res, next) => {
   try{
-    const posts = await postsModel.find();
+    const posts = await Posts.find();
 
     return res.json({
       status: 'success',
@@ -23,7 +26,7 @@ router.get('/', async (req, res, next) => {
 router.get('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await postsModel.findById(postId);
+    const post = await Posts.findById(postId);
 
     return res.json({
       status: 'success',
@@ -37,10 +40,23 @@ router.get('/:postId', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
+router.post('/', auth,  async (req, res, next) => {
   try {
-    const new_post = await postsModel.create(req.body);
+    const tags_array = req.body.tags.split('');
+    const existing_tags = await Tags.find({
+      name: {$in: tags_array},
+    })
+    const filtered_tags = tags_array.filter((el) => {
+      return !existing_tags.find((tag) => {
+        return tag.name === el
+      })
+    })
+    const new_tags = await Tags.insertMany(filtered_tags.map((el) => {
+      return {name: el}
+    }))
 
+    const new_post = await Posts.create({...req.body, tags: [...existing_tags, ...new_tags], author: req.user.id});
+    
     await new_post.save();
     return res.json({
       status: 'success',
@@ -50,7 +66,7 @@ router.post('/', async (req, res, next) => {
       }
     })
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json(error);
   }
 })
@@ -58,7 +74,7 @@ router.post('/', async (req, res, next) => {
 router.put('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const updated_post = await postsModel.findByIdAndUpdate(postId, req.body, {
+    const updated_post = await Posts.findByIdAndUpdate(postId, req.body, {
       new: true
     });
     
@@ -80,7 +96,7 @@ router.put('/:postId', async (req, res, next) => {
 router.delete('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await postsModel.findByIdAndDelete(postId)
+    const post = await Posts.findByIdAndDelete(postId)
     return res.json({
       status: 'post deleted',
       code: 200,
@@ -97,7 +113,7 @@ router.delete('/:postId', async (req, res, next) => {
 router.patch('/:postId', async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await postsModel.findById(postId);
+    const post = await Posts.findById(postId);
 
     post.usersLiked++;
 
@@ -122,7 +138,7 @@ router.patch('/:postId/save', async (req, res, next) => {
   const { postId } = req.params;
   try{
     // add to user array
-    const post = await postsModel.findById(postId);
+    const post = await Posts.findById(postId);
 
     post.usersReading++;
 
