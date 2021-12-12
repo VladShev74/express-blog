@@ -60,7 +60,24 @@ const User = new Schema(
     type: Schema.Types.ObjectId,
     ref: 'user'
     }],
+    readingList: [{
+      type: Schema.Types.ObjectId,
+      ref: 'post'
+    }],
+    likedPosts: [{
+      type: Schema.Types.ObjectId,
+      ref: 'post'
+    }],
+    likedComments: [{
+      type: Schema.Types.ObjectId,
+      ref: 'comment'
+    }],
+    posts: [{
+      type: Schema.Types.ObjectId,
+      ref: 'post'
+    }]
   },
+  
   { timestamps: true }
 );
 
