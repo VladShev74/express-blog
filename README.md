@@ -40,7 +40,8 @@
 
 - POST /comments - Create new comment for the post
 - PUT /comments/:commentId - Edit existing comment by it's author
-- PATCH /comments/:commentId - Delete existing comment
+- PATCH /comments/:commentId/like - Like existing comment
+- DELETE /comments/:commentId - Delete existing comment
 
 ## Models
 
