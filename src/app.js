@@ -6,6 +6,8 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const app = express();
+const {users} = require('./routes');
+const {User} = require('./models')
 
 mongoose
   .connect(process.env.MONGODB_URI)
