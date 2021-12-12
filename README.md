@@ -29,7 +29,7 @@
 - POST /posts - Create post
 - PUT /posts/:postId - Update post
 - DELETE /posts/:postId - Delete post
-- PATCH /posts/:postId - Like post
+- PATCH /posts/:postId/like - Like post
 - PATCH /posts/:postId/save - Add post to reading list
 
 ### Tags
@@ -40,7 +40,7 @@
 
 - POST /comments - Create new comment for the post
 - PUT /comments/:commentId - Edit existing comment by it's author
-- PATCH /comments/:commentId - 
+- PATCH /comments/:commentId - Delete existing comment
 
 ## Models
 
