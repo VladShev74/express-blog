@@ -7,18 +7,23 @@ const postsSchema = new Schema({
         type: String
     },
     title: {
+        required: true,
         type: String
     },
     body: {
+        required: true,
         type: String
     },
     usersReading: {
+        default: 0,
         type: Number
     },
     usersLiked: {
+        default: 0,
         type: Number
     },
     views: {
+        default: 0,
         type: Number
     },
     tags: [{

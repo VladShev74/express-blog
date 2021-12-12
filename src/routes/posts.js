@@ -74,9 +74,15 @@ router.post('/', auth,  async (req, res, next) => {
   }
 })
 
-router.put('/:postId', async (req, res, next) => {
+router.put('/:postId', auth, async (req, res, next) => {
   const { postId } = req.params;
   try{
+    const post = await Posts.findById(postId);
+    if(post.author !== req.user.id){
+      return res.status(403).json({
+        'message': 'bad author'
+      })
+    }
     const updated_post = await Posts.findByIdAndUpdate(postId, req.body, {
       new: true
     });
@@ -96,15 +102,22 @@ router.put('/:postId', async (req, res, next) => {
   }
 })
 
-router.delete('/:postId', async (req, res, next) => {
+router.delete('/:postId', auth, async (req, res, next) => {
   const { postId } = req.params;
   try{
-    const post = await Posts.findByIdAndDelete(postId)
+    const post = await Posts.findById(postId);
+    if(post.author !== req.user.id){
+      return res.status(403).json({
+        'message': 'bad author'
+      })
+    }
+
+    const post_toDel = await Posts.findByIdAndDelete(postId)
     return res.json({
       status: 'post deleted',
       code: 200,
       data: {
-        post,
+        post_toDel,
       }
     })
   } catch(error){
@@ -113,14 +126,24 @@ router.delete('/:postId', async (req, res, next) => {
   }
 })
 
-router.patch('/:postId', async (req, res, next) => {
+router.patch('/:postId/like', auth, async (req, res, next) => {
   const { postId } = req.params;
   try{
     const post = await Posts.findById(postId);
 
-    post.usersLiked++;
+    const isLike = req.user.likedPosts.includes(postId);
+
+    if(isLike) {
+      post.usersLiked--;
+      req.user.likedPosts.pull(postId)
+    } else{
+      post.usersLiked++;
+      req.user.likedPosts.push(postId)
+    }
 
     await post.save();
+    await req.user.save();
+
     return res.json({
       status: 'success',
       code: 200,
@@ -137,15 +160,24 @@ router.patch('/:postId', async (req, res, next) => {
 
 })
 
-router.patch('/:postId/save', async (req, res, next) => {
+router.patch('/:postId/save', auth, async (req, res, next) => {
   const { postId } = req.params;
   try{
     // add to user array
     const post = await Posts.findById(postId);
 
-    post.usersReading++;
+    const isRead = req.user.readingList.includes(postId);
 
+    if(isRead) {
+      post.usersReading--;
+      req.user.readingList.pull(postId)
+    } else{
+      post.usersReading++;
+      req.user.readingList.push(postId)
+    }
+    
     await post.save();
+    await req.user.save();
 
     return res.json({
       status: 'success',
