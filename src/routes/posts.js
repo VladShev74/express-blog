@@ -42,7 +42,7 @@ router.get('/:postId', async (req, res, next) => {
 
 router.post('/', auth,  async (req, res, next) => {
   try {
-    const tags_array = req.body.tags.split('');
+    const tags_array = req.body.tags.split(', ');// tyt
     const existing_tags = await Tags.find({
       name: {$in: tags_array},
     })
@@ -57,7 +57,10 @@ router.post('/', auth,  async (req, res, next) => {
 
     const new_post = await Posts.create({...req.body, tags: [...existing_tags, ...new_tags], author: req.user.id});
     
-    await new_post.save();
+    req.user.posts.push(new_post);
+
+    await new_post.populate("tags")
+    await req.user.save()
     return res.json({
       status: 'success',
       code: 200,
