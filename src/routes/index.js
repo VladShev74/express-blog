@@ -3,4 +3,5 @@ module.exports = {
   tags: require('./tags'),
   users: require('./users'),
   posts: require('./posts'),
+  comments: require('./comments')
 };
