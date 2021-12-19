@@ -10,13 +10,7 @@ router.get('/', async (req, res, next) => {
   try{
     const posts = await Posts.find();
 
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        posts,
-      }
-    })
+    return res.json(posts)
   } catch(error){
     next(error)
 
@@ -28,13 +22,7 @@ router.get('/:postId', async (req, res, next) => {
   try{
     const post = await Posts.findById(postId);
 
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        post,
-      }
-    })
+    return res.json(post)
   } catch(error){
     next(error)
   }
@@ -42,7 +30,7 @@ router.get('/:postId', async (req, res, next) => {
 
 router.post('/', auth,  async (req, res, next) => {
   try {
-    const tags_array = req.body.tags.split(', ');// tyt
+    const tags_array = req.body.tags.split(', ');
     const existing_tags = await Tags.find({
       name: {$in: tags_array},
     })
@@ -59,15 +47,9 @@ router.post('/', auth,  async (req, res, next) => {
     
     req.user.posts.push(new_post);
 
-    await new_post.populate("tags")
+    await new_post.populate("tags");
     await req.user.save()
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        new_post,
-      }
-    })
+    return res.json(new_post)
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -88,13 +70,7 @@ router.put('/:postId', auth, async (req, res, next) => {
     });
     
     
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        updated_post,
-      }
-    })
+    return res.json(updated_post)
 
   }catch(error){
     res.status(500).send({message: 'error'})
@@ -113,13 +89,7 @@ router.delete('/:postId', auth, async (req, res, next) => {
     }
 
     const post_toDel = await Posts.findByIdAndDelete(postId)
-    return res.json({
-      status: 'post deleted',
-      code: 200,
-      data: {
-        post_toDel,
-      }
-    })
+    return res.json(post_toDel)
   } catch(error){
     res.status(500).send({message: 'error'})
     console.log(error)
@@ -144,13 +114,7 @@ router.patch('/:postId/like', auth, async (req, res, next) => {
     await post.save();
     await req.user.save();
 
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        post,
-      }
-    })
+    return res.json(post)
 
   
   } catch(error){
@@ -179,13 +143,7 @@ router.patch('/:postId/save', auth, async (req, res, next) => {
     await post.save();
     await req.user.save();
 
-    return res.json({
-      status: 'success',
-      code: 200,
-      data: {
-        post,
-      }
-    })
+    return res.json(post)
 
   
   } catch(error){
