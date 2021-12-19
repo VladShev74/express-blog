@@ -1,3 +1,3 @@
-// module.exports = {
-//   tagsValidator: require('./tagsValidator'),
-// };
+module.exports = {
+  tagsValidator: require('./tagsValidator'),
+};
