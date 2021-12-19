@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { schemaValidate } = require('../middlewares');
 
 const { auth } = require("../middlewares");
 const { Tags, Posts } = require("../models");
@@ -28,7 +29,7 @@ router.get("/:postId", async (req, res, next) => {
   }
 });
 
-router.post("/", auth, async (req, res, next) => {
+router.post("/", schemaValidate(postCreate), auth, async (req, res, next) => {
   try {
     const tags_array = req.body.tags.split(', ');
     const existing_tags = await Tags.find({
@@ -58,7 +59,7 @@ router.post("/", auth, async (req, res, next) => {
   }
 });
 
-router.put('/:postId', auth, async (req, res, next) => {
+router.put('/:postId', schemaValidate(postUpdate), auth, async (req, res, next) => {
   const { postId } = req.params;
   try{
     const post = await Posts.findById(postId);
