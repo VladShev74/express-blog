@@ -7,7 +7,7 @@ require("dotenv").config();
 const passport = require("passport");
 const { Strategy, ExtractJwt } = require("passport-jwt");
 const app = express();
-const { auth, tags, users, posts } = require("./routes");
+const { auth, tags, users, posts, comments } = require("./routes");
 const { User } = require("./models");
 
 mongoose
@@ -45,5 +45,6 @@ app.use("/api/auth", auth);
 app.use("/api/tags", tags);
 app.use("/api/users", users);
 app.use("/api/posts", posts);
+app.use("/api/comments", comments);
 
 module.exports = app;
