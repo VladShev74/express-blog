@@ -10,4 +10,4 @@ const Tags = new Schema(
   { timestamps: true }
 );
 
-module.exports = model("tags", Tags);
+module.exports = model("tag", Tags);

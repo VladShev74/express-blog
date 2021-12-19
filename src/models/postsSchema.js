@@ -7,18 +7,23 @@ const postsSchema = new Schema({
         type: String
     },
     title: {
+        required: true,
         type: String
     },
     body: {
+        required: true,
         type: String
     },
     usersReading: {
+        default: 0,
         type: Number
     },
     usersLiked: {
+        default: 0,
         type: Number
     },
     views: {
+        default: 0,
         type: Number
     },
     tags: [{
@@ -37,6 +42,6 @@ const postsSchema = new Schema({
     // },
 
 
-const postsModel = mongoose.model("Posts", postsSchema);
+const postsModel = mongoose.model("post", postsSchema);
 
 module.exports = postsModel;
