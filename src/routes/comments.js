@@ -1,5 +1,7 @@
 const express = require("express");
 const router = express.Router();
+const { commentsValidator } = require('../validationSchemas');
+const { schemaValidate } = require('../middlewares');
 
 const { auth } = require("../middlewares");
 const { Comment } = require("../models");
@@ -9,7 +11,7 @@ const { Comment } = require("../models");
 // PATCH /comments/:commentId/like - Like existing comment
 // DELETE /comments/:commentId - Delete existing comment
 
-router.post("/", auth, async (req, res, next) => { // auth
+router.post("/", schemaValidate(commentsValidator.commentCreate), auth, async (req, res, next) => { // auth
     try {
       const new_comment = await Comment.create({...req.body, author: req.user.id}); //  author: req.user.id
       
@@ -24,7 +26,7 @@ router.post("/", auth, async (req, res, next) => { // auth
     } 
 });
 
-router.put('/:commentId', auth, async (req, res, next) => {
+router.put('/:commentId', schemaValidate(commentsValidator.commentUpdate), auth, async (req, res, next) => {
     const { commentId } = req.params;
     try{
       const comment = await Comment.findById(commentId);
