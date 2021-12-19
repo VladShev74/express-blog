@@ -53,10 +53,9 @@ exports.update = async (req, res) => {
       res.json({
         user: req.user, followUser
       })
-     
+    
     } catch (error) {
       console.log(error);
       res.status(500).send(error);
     }
   };
-  
