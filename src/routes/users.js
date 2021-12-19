@@ -1,5 +1,5 @@
 const express = require('express');
-const {usersController} = require('../controllers/users.controller');
+const usersController = require('../controllers/users.controller');
 const schemaValidate = require('../middlewares/schemaValidate');
 
 const router = express.Router()
