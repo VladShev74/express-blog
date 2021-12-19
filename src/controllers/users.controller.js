@@ -26,7 +26,31 @@ exports.update = async (req, res) => {
 
   exports.getById = async (req, res) => {
     try {
-      const targetUser = await User.findById(req.params.UserId);
+      const targetUser = await User.findById(req.params.UserId)
+      .populate({
+        path: 'readingList',
+        populate: [
+          {
+            path: 'author',
+          },
+          {
+            path: 'tags',
+          },
+        ],
+      })
+      .populate('likedPosts')
+      .populate('likedComments')
+      .populate({
+        path: 'posts',
+        populate: [
+          {
+            path: 'author',
+          },
+          {
+            path: 'tags',
+          },
+        ],
+      })
       res.json(targetUser);
     } catch (error) {
       console.log(error);

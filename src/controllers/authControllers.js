@@ -1,5 +1,7 @@
 const { User } = require('../models');
 const jwt = require('jsonwebtoken');
+const { attachment } = require('express/lib/response');
+const bcrypt = require('bcryptjs');
 
 exports.register = async (req, res) => {
   try {
@@ -9,7 +11,11 @@ exports.register = async (req, res) => {
       return;
     }
 
-    const newUser = await User.create(req.body);
+    const hashedPassword = await bcrypt.hash(req.body.password, 12)
+    const newUser = await User.create({
+      ...req.body,
+      password: hashedPassword,
+    });
 
     const payload = {
       _id: newUser._id,
@@ -57,7 +63,9 @@ exports.login = async (req, res) => {
 
 exports.me = async (req, res) => {
   try {
-    const existingUser = await User.findOne(req.user);
+    const existingUser = await User.findById(req.user._id)
+    .populate('likedPosts')
+    .populate('likedComments');
     if (!existingUser) {
       res.status(409).json({ message: "This user doesn't exist." });
       return;

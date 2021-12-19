@@ -78,11 +78,19 @@ const User = new Schema(
     }]
   },
   
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+  }
 );
 
-User.pre("save", async function () {
-  this.password = await bcrypt.hash(this.password, 12);
+User.virtual('fullName').get(function () {
+  return this.firstName + ' ' + this.lastName;
 });
 
 User.methods.validPassword = async function (password) {
