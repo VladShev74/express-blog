@@ -7,11 +7,11 @@ exports.register = async (req, res) => {
   try {
     const existingUser = await User.findOne({ username: req.body.username });
     if (existingUser) {
-      res.status(409).json({ message: "This username is already in use." });
+      res.status(409).json({ message: 'This username is already in use.' });
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 12)
+    const hashedPassword = await bcrypt.hash(req.body.password, 12);
     const newUser = await User.create({
       ...req.body,
       password: hashedPassword,
@@ -22,7 +22,7 @@ exports.register = async (req, res) => {
     };
 
     const jwToken = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: '7d',
     });
 
     res.json({
@@ -39,7 +39,7 @@ exports.login = async (req, res) => {
   try {
     const user = await User.findOne({ username: req.body.username });
     if (!user || !(await user.validPassword(req.body.password))) {
-      res.status(400).json({ message: "invalid credentials" });
+      res.status(400).json({ message: 'invalid credentials' });
       return;
     }
 
@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
     };
 
     const jwToken = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: '7d',
     });
 
     res.json({
@@ -64,8 +64,10 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   try {
     const existingUser = await User.findById(req.user._id)
-    .populate('likedPosts')
-    .populate('likedComments');
+      .populate('likedPosts')
+      .populate('likedComments')
+      .populate('readingList');
+
     if (!existingUser) {
       res.status(409).json({ message: "This user doesn't exist." });
       return;
