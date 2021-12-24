@@ -76,10 +76,6 @@ const User = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'post'
     }],
-    comments: [{
-      type: Schema.Types.ObjectId,
-      ref: 'comment'
-    }]
   },
   
   {

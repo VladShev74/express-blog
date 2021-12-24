@@ -4,7 +4,7 @@ const { commentsValidator } = require('../validationSchemas');
 const { schemaValidate } = require('../middlewares');
 
 const { auth } = require("../middlewares");
-const { Comment } = require("../models");
+const { Comment, Posts } = require("../models");
 
 // POST /comments - Create new comment for the post
 // PUT /comments/:commentId - Edit existing comment by it's author
@@ -13,17 +13,16 @@ const { Comment } = require("../models");
 
 router.post("/", schemaValidate(commentsValidator.commentCreate), auth, async (req, res, next) => { // auth
     try {
-      const new_comment = await Comment.create({...req.body, author: req.user.id}); //  author: req.user.id
-      
-      req.user.comments.push(new_comment);
-  
-      await new_comment.populate("author");
-      await req.user.save();
-      return res.json(new_comment);
+      const new_comment = await Comment.create({...req.body, author: req.user._id}); //  author: req.user.id     
+
+      const targetPost = await Posts.findById(req.body.ParentPost);
+      targetPost.comments.push(new_comment);
+      tagetPost.comments.push(new_comment);
+      await targetPost.save();
     } catch (error) {
       console.log(error);
       res.status(500).json(error);
-    } 
+    }
 });
 
 router.put('/:commentId', schemaValidate(commentsValidator.commentUpdate), auth, async (req, res, next) => {
@@ -70,7 +69,6 @@ router.patch('/:commentId/like', auth, async (req, res, next) => {
   
       return res.json(comment)
   
-    
     } catch(error){
       res.status(500).send({message: 'error'})
       console.log(error)
