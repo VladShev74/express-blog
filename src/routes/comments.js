@@ -19,8 +19,7 @@ router.post(
     // auth
     try {
       const new_comment = await Comment.create({...req.body, author: req.user._id}); //  author: req.user.id     
-
-      const targetPost = await Posts.findById(req.body.ParentPost);
+      const targetPost = await Posts.findById(req.body.parentPost);
       targetPost.comments.push(new_comment);
       await targetPost.save();
     } catch (error) {
