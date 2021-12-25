@@ -85,7 +85,7 @@ router.put(
     const { postId } = req.params;
     try {
       const post = await Posts.findById(postId);
-      if (post.author !== req.user.id) {
+      if (!post.author.equals(req.user.id)) {
         return res.status(403).json({
           message: 'bad author',
         });
@@ -106,7 +106,7 @@ router.delete('/:postId', auth, async (req, res, next) => {
   const { postId } = req.params;
   try {
     const post = await Posts.findById(postId);
-    if (post.author !== req.user.id) {
+    if (!post.author.equals(req.user.id)) {
       return res.status(403).json({
         message: 'bad author',
       });
