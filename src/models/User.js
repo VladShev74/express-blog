@@ -52,6 +52,9 @@ const User = new Schema(
       minlength: 3,
       required: false,
     },
+    birthDate: {
+      type: Date,
+    },
     following: [{
       type: Schema.Types.ObjectId,
       ref: 'user'
