@@ -24,7 +24,7 @@ router.get('/:postId', async (req, res, next) => {
     const post = await Posts.findById(postId)
       .populate('tags')
       .populate('author')
-      .populate('comments');
+      .populate({ path: 'comments', populate: { path: 'author' }});
 
     return res.json(post);
   } catch (error) {
