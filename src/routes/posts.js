@@ -90,8 +90,8 @@ router.put(
   async (req, res, next) => {
     const { postId } = req.params;
     try {
-      // const post = await Posts.findById(postId);
-      if (req.user._id.toString() !== req.params.userId) {
+      const post = await Posts.findById(postId);
+      if (!post.author.equals(req.user._id)) {
         return res.status(403).json({
           message: "bad author",
         });
