@@ -22,6 +22,7 @@ router.post(
       const targetPost = await Posts.findById(req.body.parentPost);
       targetPost.comments.push(new_comment);
       await targetPost.save();
+      res.json(new_comment);
     } catch (error) {
       console.log(error);
       res.status(500).json(error);
