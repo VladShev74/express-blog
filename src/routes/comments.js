@@ -87,8 +87,8 @@ router.patch('/:commentId/like', auth, async (req, res, next) => {
 router.delete('/:commentId', auth, async (req, res, next) => {
   const { commentId } = req.params;
   try {
-    const post = await Posts.findById(comment.parentPost);
     const comment = await Comment.findById(commentId);
+    const post = await Posts.findById(comment.parentPost);
     if (comment.author.toString() !== req.user.id) {
       return res.status(403).json({
         message: 'bad author',

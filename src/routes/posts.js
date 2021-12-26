@@ -1,15 +1,39 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const { schemaValidate } = require('../middlewares');
-const { postsValidator } = require('../validationSchemas');
+const { schemaValidate } = require("../middlewares");
+const { postsValidator } = require("../validationSchemas");
 
-const { auth } = require('../middlewares');
-const { Tags, Posts } = require('../models');
+const { auth } = require("../middlewares");
+const { Tags, Posts } = require("../models");
 
 // respond with "hello world" when a GET request is made to the homepage
-router.get('/', async (req, res, next) => {
+const createTags = async (tagsString) => {
+  let new_tags = [];
+  let existing_tags = [];
+  if (tagsString) {
+    const tags_array = tagsString.split(", ");
+    existing_tags = await Tags.find({
+      name: { $in: tags_array },
+    });
+    const filtered_tags = tags_array.filter((el) => {
+      return !existing_tags.find((tag) => {
+        return tag.name === el;
+      });
+    });
+
+    new_tags = await Tags.insertMany(
+      filtered_tags.map((el) => {
+        return { name: el };
+      })
+    );
+    return [...existing_tags, ...new_tags];
+  } else {
+    return [];
+  }
+};
+router.get("/", async (req, res, next) => {
   try {
-    const posts = await Posts.find().populate('tags').populate('author');
+    const posts = await Posts.find().populate("tags").populate("author");
 
     return res.json(posts);
   } catch (error) {
@@ -18,13 +42,13 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.get('/:postId', async (req, res, next) => {
+router.get("/:postId", async (req, res, next) => {
   const { postId } = req.params;
   try {
     const post = await Posts.findById(postId)
-      .populate('tags')
-      .populate('author')
-      .populate({ path: 'comments', populate: { path: 'author' }});
+      .populate("tags")
+      .populate("author")
+      .populate({ path: "comments", populate: { path: "author" } });
 
     return res.json(post);
   } catch (error) {
@@ -34,40 +58,22 @@ router.get('/:postId', async (req, res, next) => {
 });
 
 router.post(
-  '/',
+  "/",
   schemaValidate(postsValidator.postCreate),
   auth,
   async (req, res, next) => {
     try {
-      let new_tags = [];
-      let existing_tags = [];
-      if (req.body.tags) {
-        const tags_array = req.body.tags.split(', ');
-        existing_tags = await Tags.find({
-          name: { $in: tags_array },
-        });
-        const filtered_tags = tags_array.filter((el) => {
-          return !existing_tags.find((tag) => {
-            return tag.name === el;
-          });
-        });
-
-        new_tags = await Tags.insertMany(
-          filtered_tags.map((el) => {
-            return { name: el };
-          })
-        );
-      }
+      const tags = await createTags(req.body.tags);
 
       const new_post = await Posts.create({
         ...req.body,
-        tags: [...existing_tags, ...new_tags],
+        tags,
         author: req.user.id,
       });
 
       req.user.posts.push(new_post);
 
-      await new_post.populate('tags');
+      await new_post.populate("tags");
       await req.user.save();
       return res.json(new_post);
     } catch (error) {
@@ -78,51 +84,52 @@ router.post(
 );
 
 router.put(
-  '/:postId',
+  "/:postId",
   schemaValidate(postsValidator.postUpdate),
   auth,
   async (req, res, next) => {
     const { postId } = req.params;
     try {
-      const post = await Posts.findById(postId);
+      // const post = await Posts.findById(postId);
       if (req.user._id.toString() !== req.params.userId) {
         return res.status(403).json({
-          message: 'bad author',
+          message: "bad author",
         });
       }
-      const updated_post = await Posts.findByIdAndUpdate(postId, req.body, {
+      const tags = await createTags(req.body.tags);
+      const updated_post = await Posts.findByIdAndUpdate(postId, {...req.body, tags}, {
         new: true,
       });
 
       return res.json(updated_post);
     } catch (error) {
-      res.status(500).send({ message: 'error' });
+      res.status(500).send({ message: "error" });
       console.log(error);
     }
   }
 );
 
-router.delete('/:postId', auth, async (req, res, next) => {
+router.delete("/:postId", auth, async (req, res, next) => {
   const { postId } = req.params;
   try {
     const post = await Posts.findById(postId);
     if (!post.author.equals(req.user._id)) {
       return res.status(403).json({
-        message: 'bad author',
+        message: "bad author",
       });
     }
 
     const post_toDel = await Posts.findByIdAndDelete(postId);
     req.user.posts.pull(req.params._id);
-    await user.save();
+    await req.user.save();
     return res.json(post_toDel);
   } catch (error) {
-    res.status(500).send({ message: 'error' });
+    res.status(500).send({ message: "error" });
     console.log(error);
   }
 });
 
-router.patch('/:postId/like', auth, async (req, res, next) => {
+router.patch("/:postId/like", auth, async (req, res, next) => {
   const { postId } = req.params;
   try {
     const post = await Posts.findById(postId);
@@ -142,12 +149,12 @@ router.patch('/:postId/like', auth, async (req, res, next) => {
 
     return res.json(post);
   } catch (error) {
-    res.status(500).send({ message: 'error' });
+    res.status(500).send({ message: "error" });
     console.log(error);
   }
 });
 
-router.patch('/:postId/save', auth, async (req, res, next) => {
+router.patch("/:postId/save", auth, async (req, res, next) => {
   const { postId } = req.params;
   try {
     // add to user array
@@ -168,7 +175,7 @@ router.patch('/:postId/save', auth, async (req, res, next) => {
 
     return res.json(post);
   } catch (error) {
-    res.status(500).send({ message: 'error' });
+    res.status(500).send({ message: "error" });
     console.log(error);
   }
 });
