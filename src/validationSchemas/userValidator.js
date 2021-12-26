@@ -6,7 +6,7 @@ exports.userUpdate = yup.object().shape({
   location: yup.string(),
   avatarUrl: yup.string().url(),
   githubUrl: yup.string().url().optional(),
-  description: yup.string().optional(),
+  description: yup.string().min(3).optional(),
   work: yup.string().optional(),
   hobby: yup.string().optional(),
   birthDate: yup.date(),
