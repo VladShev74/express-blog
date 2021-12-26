@@ -85,7 +85,7 @@ router.put(
     const { postId } = req.params;
     try {
       const post = await Posts.findById(postId);
-      if (!post.author.equals(req.user.id)) {
+      if (req.user._id.toString() !== req.params.userId) {
         return res.status(403).json({
           message: 'bad author',
         });
@@ -106,13 +106,15 @@ router.delete('/:postId', auth, async (req, res, next) => {
   const { postId } = req.params;
   try {
     const post = await Posts.findById(postId);
-    if (!post.author.equals(req.user.id)) {
+    if (!post.author.equals(req.user._id)) {
       return res.status(403).json({
         message: 'bad author',
       });
     }
 
     const post_toDel = await Posts.findByIdAndDelete(postId);
+    req.user.posts.pull(req.params._id);
+    await user.save();
     return res.json(post_toDel);
   } catch (error) {
     res.status(500).send({ message: 'error' });
