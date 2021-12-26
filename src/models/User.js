@@ -39,17 +39,14 @@ const User = new Schema(
     },
     description: {
       type: String,
-      minlength: 3,
       required: false,
     },
     work: {
       type: String,
-      minlength: 3,
       required: false,
     },
     hobby: {
       type: String,
-      minlength: 3,
       required: false,
     },
     birthDate: {
